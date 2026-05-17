@@ -15,7 +15,7 @@ data "aws_ami" "ubuntu" {
 
 # Security Group
 resource "aws_security_group" "demo_sg" {
-  name        = "terraform-demo-sg-2"
+  name        = "terraform-demo-sg-3"
   description = "Allow SSH and HTTP"
 
   ingress {
