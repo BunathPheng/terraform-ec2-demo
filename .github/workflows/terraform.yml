@@ -28,8 +28,11 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan
+      - name: Check files
+        run: ls -la
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
       - name: Terraform List
         run: terraform state list
+        
