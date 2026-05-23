@@ -21,9 +21,9 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init (S3 backend)
+      - name: Terraform Init
         run: |
-          terraform init \
+          terraform init -reconfigure \
             -backend-config="bucket=${{ secrets.TF_BUCKET }}" \
             -backend-config="key=dev/ec2/terraform.tfstate" \
             -backend-config="region=${{ secrets.AWS_REGION }}"
