@@ -1,8 +1,20 @@
-provider "aws" {
-  region = "ap-southeast-1"
+terraform {
+  required_version = ">= 1.0"
+
+  backend "s3" {}
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
 }
 
-# Get latest Ubuntu AMI
+provider "aws" {
+  region = var.region
+}
+
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"]
@@ -13,21 +25,17 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-# Security Group
 resource "aws_security_group" "demo_sg" {
-  name        = "terraform-demo-sg-4"
-  description = "Allow SSH and HTTP"
+  name        = "terraform-demo-sg"
 
   ingress {
-    description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.ssh_cidr]
   }
 
   ingress {
-    description = "HTTP"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -42,13 +50,30 @@ resource "aws_security_group" "demo_sg" {
   }
 }
 
-# EC2 Instance
 resource "aws_instance" "demo" {
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.micro"
-  vpc_security_group_ids = [aws_security_group.demo_sg.id]
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = var.instance_type
+
+  vpc_security_group_ids = [
+    aws_security_group.demo_sg.id
+  ]
+
+  key_name = var.key_name
+
+  user_data = <<-EOF
+              #!/bin/bash
+              apt update -y
+              apt install nginx -y
+              systemctl enable nginx
+              systemctl start nginx
+              echo "Hello from Terraform" > /var/www/html/index.html
+              EOF
 
   tags = {
-    Name = "terraform-ubuntu"
+    Name = "terraform-ec2"
   }
+}
+
+output "public_ip" {
+  value = aws_instance.demo.public_ip
 }
