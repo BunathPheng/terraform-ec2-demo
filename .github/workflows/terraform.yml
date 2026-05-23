@@ -26,6 +26,15 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Terraform State List
+        run: terraform state list
+      
+      - name: Terraform Plan Destroy
+        run: terraform plan -destroy
+      
+      - name: Check AWS Account
+        run: aws sts get-caller-identity
+
       - name: Terraform Plan
         run: terraform plan
 
