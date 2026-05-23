@@ -7,7 +7,7 @@ variable "instance_type" {
 }
 
 variable "key_name" {
-  type = "key_nath"
+  type = string
 }
 
 variable "ssh_cidr" {
