@@ -26,7 +26,7 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_security_group" "demo_sg" {
-  name        = "terraform-demo-sg-2"
+  name        = "terraform-demo-sg-7"
 
   ingress {
     from_port   = 22
