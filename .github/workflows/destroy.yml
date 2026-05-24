@@ -1,14 +1,14 @@
 name: Safe Terraform Destroy
 
 on:
-  workflow_dispatch:   # manual trigger only
+  workflow_dispatch:
 
 jobs:
   destroy:
     runs-on: ubuntu-latest
 
     environment:
-      name: production   # 👈 THIS triggers approval gate
+      name: production   # approval gate
 
     steps:
       - name: Checkout code
@@ -24,23 +24,20 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Terraform Init
+      - name: Terraform Init (with S3 backend)
         run: terraform init
-        
-      - name: Terraform State List
-        run: terraform state list
-      
-      - name: Terraform Plan Destroy
-        run: terraform plan -destroy
-      
-      - name: Check AWS Account
+
+      - name: Check AWS Identity
         run: aws sts get-caller-identity
 
+      - name: Terraform State List
+        run: terraform state list
+
       - name: Terraform Plan Destroy
         run: terraform plan -destroy
 
-      - name: Manual confirmation message
-        run: echo "Waiting for environment approval before destroy"
+      - name: Manual approval step
+        run: echo "Waiting for environment approval..."
 
       - name: Terraform Destroy
         run: terraform destroy -auto-approve
